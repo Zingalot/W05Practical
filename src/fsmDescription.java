@@ -26,15 +26,16 @@ public class fsmDescription {
             scanner.useDelimiter("\n");
             while (scanner.hasNext()) {
                 String line = scanner.next();
-                if (line == null || line.equals("\r") || line.equals("\n")) {//Ensuring that an empty line is not included
+                if (line == null || line.equals("\r") || line.equals("\n") || line.equals("") ) {//Ensuring that an empty line is not included
                     continue;
                 }
                 Scanner scanner1 = new Scanner(line);
                 scanner1.useDelimiter("\\s");
-                /*System.out.println(scanner1.next());
-                System.out.println(parseInt(scanner1.next()));
-                System.out.println(scanner1.next());
-                System.out.println(scanner1.next());*/
+                /*System.out.print(parseInt(scanner1.next()));
+                System.out.print(scanner1.next());
+                System.out.print(scanner1.next());
+                System.out.print(parseInt(scanner1.next()));
+                System.out.println();*/
                 currentStateList.add(parseInt(scanner1.next()));
                 inputList.add(scanner1.next());
                 outputList.add(scanner1.next());
