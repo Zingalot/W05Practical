@@ -84,22 +84,33 @@ public class fsminterpreter {
 
                 //Inputs data into the maps provided that the relevant data is there, and the current state being
                 //considered hasn't changed
-                while(iiterator.hasNext() && nsiterator.hasNext() && oiterator.hasNext() && nextInterpret==currentInterpret){
+                while(iiterator.hasNext() && nsiterator.hasNext() && oiterator.hasNext()){
                     String input = iiterator.next();
-                    inputOutputMaps.get(currentInterpret).put(input,oiterator.next());
-                    inputNextStateMaps.get(currentInterpret).put(input,nsiterator.next());
 
-                    //Only updates next interpret if possible
-                    if(csiterator.hasNext()) {
-                        nextInterpret = csiterator.next();
+                    if(nextInterpret!=currentInterpret) {
+                        inputOutputMaps.get(currentInterpret).put(input, oiterator.next());
+                        inputNextStateMaps.get(currentInterpret).put(input, nsiterator.next());
+                        if(csiterator.hasNext()) {
+                            nextInterpret = csiterator.next();
+                        }
+                    }
 
-                        //if next interpret has 'just' updated, place the key value pairs into the map, as this is
-                        //the final line for the given current state. This assumes that the input tables are organised
-                        //normally.
-                        if(nextInterpret != currentInterpret){
-                            String input1 = iiterator.next();
-                            inputOutputMaps.get(currentInterpret).put(input1,oiterator.next());
-                            inputNextStateMaps.get(currentInterpret).put(input1,nsiterator.next());
+
+                    else{//nextInterpret and currentInterpret were equal at the start of this loop iteration
+                        inputOutputMaps.get(currentInterpret).put(input, oiterator.next());
+                        inputNextStateMaps.get(currentInterpret).put(input, nsiterator.next());
+                        //Only updates next interpret if possible
+                        if (csiterator.hasNext()) {
+                            nextInterpret = csiterator.next();
+
+                            //if next interpret has 'just' updated, place the key value pairs into the map, as this is
+                            //the final line for the given current state. This assumes that the input tables are organised
+                            //normally.
+                            if (nextInterpret != currentInterpret) {
+                                String input1 = iiterator.next();
+                                inputOutputMaps.get(currentInterpret).put(input1, oiterator.next());
+                                inputNextStateMaps.get(currentInterpret).put(input1, nsiterator.next());
+                            }
                         }
                     }
                 }

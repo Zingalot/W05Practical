@@ -57,23 +57,18 @@ public class fsmDescription {
     }
 
     public ArrayList<Integer> getCurrentStateList() {
-        //TODO Read description file to return list of current states
-
         return currentStateList;
     }
 
     public ArrayList<Integer> getNextStateList() {
-        //TODO Read description file to return list of next states
         return nextStateList;
     }
 
     public ArrayList<String> getInputList() {
-        //TODO Read description file to return list of inputs
         return inputList;
     }
 
     public ArrayList<String> getOutputList() {
-        //TODO Read description file to return list of outputs
         return outputList;
     }
 }
