@@ -111,6 +111,7 @@ public class fsminterpreter {
                                 inputOutputMaps.get(currentInterpret).put(input1, oiterator.next());
                                 inputNextStateMaps.get(currentInterpret).put(input1, nsiterator.next());
                             }
+                            break;
                         }
                     }
                 }
@@ -123,19 +124,14 @@ public class fsminterpreter {
             //Debug printer
             for(int i = 1; i<inputOutputMaps.size(); i++){
                 Iterator iterator = inputOutputMaps.get(i).keySet().iterator();
+                Iterator iterator2 = inputNextStateMaps.get(i).keySet().iterator();
                 System.out.println("State = " + i + ": ");
                 while(iterator.hasNext()){
                     String item = (String) iterator.next();
-                    System.out.println("Input = " + item + ", Output = " + inputOutputMaps.get(i).get(item));
+                    String item2 = (String) iterator2.next();
+                    System.out.println("Input = " + item + ", Output = " + inputOutputMaps.get(i).get(item) + ", Next State = " + inputNextStateMaps.get(i).get(item));
                 }
-            }
-            for(int i = 1; i<inputNextStateMaps.size(); i++){
-                Iterator iterator = inputNextStateMaps.get(i).keySet().iterator();
-                System.out.println("State = " + i + ": ");
-                while(iterator.hasNext()){
-                    String item = (String) iterator.next();
-                    System.out.println("Input = " + item + ", Next State = " + inputNextStateMaps.get(i).get(item));
-                }
+                System.out.println();
             }
 
 
