@@ -13,19 +13,12 @@ public class fsminterpreter {
         String descriptionFileName = "";
         fsmDescription descriptionFile;
 
-        /*ArrayList<Long> currentStateList;
-        ArrayList<String> inputList;
-        ArrayList<String> outputList;
-        ArrayList<Long> nextStateList;*/
-
         ArrayList<HashMap<String, String>> inputOutputMaps = new ArrayList();
         ArrayList<HashMap<String, Integer>> inputNextStateMaps = new ArrayList();
-        int currentinterpret;
+        int currentInterpret;
+        int nextInterpret;
         int currentState = 0;
-        int initial;
 
-        /*HashMap<String, String> outputMap = new HashMap<>();
-        HashMap<String, String> nextStateMap = new HashMap<>();*/
         char[] inputArray = null;
         try {
             descriptionFileName = args[0];
@@ -39,7 +32,8 @@ public class fsminterpreter {
         descriptionFile = new fsmDescription(descriptionFileName);
 
         if(descriptionFile.wellFormed()) {
-            //TODO Interpret FSM
+
+            //Checks that content can be read from the description file correctly, exits if not possible.
             try {
                 descriptionFile.readContent();
             } catch (IOException e){
@@ -47,31 +41,76 @@ public class fsminterpreter {
                 System.exit(0);
             }
 
-            /*currentStateList = descriptionFile.getCurrentStateList();
-            inputList = descriptionFile.getInputList();
-            outputList = descriptionFile.getOutputList();
-            nextStateList = descriptionFile.getNextStateList();*/
-
+            //Creates iterators for current state, input, next state and output for the lists created in the
+            //fsmDescription class based off of the description provided to the program.
             ListIterator<Integer> csiterator = descriptionFile.getCurrentStateList().listIterator();
             ListIterator<String> iiterator = descriptionFile.getInputList().listIterator();
             ListIterator<Integer> nsiterator = descriptionFile.getNextStateList().listIterator();
             ListIterator<String> oiterator = descriptionFile.getOutputList().listIterator();
-            currentinterpret = descriptionFile.getCurrentStateList().get(0);
-            initial = currentinterpret;
 
+            //Sets the current state being 'interpreted' to the first state in the current state list
+            currentInterpret = descriptionFile.getCurrentStateList().get(0);
+
+            //Iterates the csiterator as the 'current' state being interpreted has already been given an intial value
+            csiterator.next();
+
+            //Creates two default hash maps to occupy index 0 in the map lists.
+            inputOutputMaps.add(new HashMap<>());
+            inputNextStateMaps.add(new HashMap<>());
+
+            //Creates the maps from input to output and input to next state and places them in lists where the index of
+            //the list represents the current state being considered, and the maps show the expected behavhiour with
+            //respect to output and next state for a given input.
             while(csiterator.hasNext()) {
-                inputOutputMaps.add(currentinterpret, new HashMap<>());
-                inputNextStateMaps.add(currentinterpret, new HashMap<>());
-                currentinterpret = csiterator.next();
-                while(iiterator.hasNext() && nsiterator.hasNext() && oiterator.hasNext() && csiterator.next()!=currentinterpret){
-                    inputOutputMaps.get(currentinterpret).put(iiterator.next(),oiterator.next());
-                    inputNextStateMaps.get(currentinterpret).put(iiterator.next(),nsiterator.next());
 
+                //Ensures that if the fsm description is 'out of order' such that the current states are not passed
+                //from 1 onwards, the lists have placeholder maps to avoid index out of bounds exceptions.
+                for(int i = 0; i < currentInterpret; i++){
+                    if(inputOutputMaps.size()<i-1){
+                        inputOutputMaps.add(new HashMap<>());
+                    }
+                    if(inputNextStateMaps.size()<i-1){
+                        inputNextStateMaps.add(new HashMap<>());
+                    }
                 }
+
+                //Creates new maps for the current state being considered
+                inputOutputMaps.add(currentInterpret, new HashMap<>());
+                inputNextStateMaps.add(currentInterpret, new HashMap<>());
+
+                //Keeps track of the next 'current state' to be considered, so that the loop can have a condition for
+                //when to stop.
+                nextInterpret = csiterator.next();
+
+                //Inputs data into the maps provided that the relevant data is there, and the current state being
+                //considered hasn't changed
+                while(iiterator.hasNext() && nsiterator.hasNext() && oiterator.hasNext() && nextInterpret==currentInterpret){
+                    String input = iiterator.next();
+                    inputOutputMaps.get(currentInterpret).put(input,oiterator.next());
+                    inputNextStateMaps.get(currentInterpret).put(input,nsiterator.next());
+
+                    //Only updates next interpret if possible
+                    if(csiterator.hasNext()) {
+                        nextInterpret = csiterator.next();
+
+                        //if next interpret has 'just' updated, place the key value pairs into the map, as this is
+                        //the final line for the given current state. This assumes that the input tables are organised
+                        //normally.
+                        if(nextInterpret != currentInterpret){
+                            String input1 = iiterator.next();
+                            inputOutputMaps.get(currentInterpret).put(input1,oiterator.next());
+                            inputNextStateMaps.get(currentInterpret).put(input1,nsiterator.next());
+                        }
+                    }
+                }
+
+                //Update the current interpret.
+                currentInterpret = nextInterpret;
             }
 
+
             //Debug printer
-            for(int i = 0; i<inputOutputMaps.size(); i++){
+            for(int i = 1; i<inputOutputMaps.size(); i++){
                 Iterator iterator = inputOutputMaps.get(i).keySet().iterator();
                 System.out.println("State = " + i + ": ");
                 while(iterator.hasNext()){
@@ -79,7 +118,7 @@ public class fsminterpreter {
                     System.out.println("Input = " + item + ", Output = " + inputOutputMaps.get(i).get(item));
                 }
             }
-            for(int i = 0; i<inputNextStateMaps.size(); i++){
+            for(int i = 1; i<inputNextStateMaps.size(); i++){
                 Iterator iterator = inputNextStateMaps.get(i).keySet().iterator();
                 System.out.println("State = " + i + ": ");
                 while(iterator.hasNext()){
