@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 
@@ -42,19 +43,32 @@ public class fsmDescription {
                 nextStateList.add(parseInt(scanner1.next()));
             }
         } catch (IOException e){
-            System.out.println(e.getMessage());
-            System.out.println("Bad input");
+            System.out.println("Bad description");
             System.exit(0);
         }
     }
 
     public boolean wellFormed() {
         //Sample code
+        boolean legal = true;
         if(this.filename == ""){
-            return false;
+            legal = false;
         }
-        return true;
-        //TODO Decide if the description is well formed or not
+        for(int i = 0; i < nextStateList.size(); i++){
+            if(!currentStateList.contains(nextStateList.get(i))){
+                legal = false;
+            }
+        }
+        HashSet distinctInput = new HashSet(inputList);
+        HashSet distinctState = new HashSet(currentStateList);
+        if(distinctInput.size()*distinctState.size()!=currentStateList.size()){
+            legal = false;
+        }
+        if(currentStateList.size() != inputList.size() || currentStateList.size() != nextStateList.size() ||
+        currentStateList.size() != outputList.size()) {
+            legal = false;
+        }
+        return legal;
     }
 
     public ArrayList<Integer> getCurrentStateList() {

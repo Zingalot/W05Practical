@@ -6,10 +6,11 @@ public class fsminterpreter {
 
 
     public static void main(String args[]){
+        String badDescription =  "Bad description";
         String badInput = "Bad input";
 
         String descriptionFileName = "";
-        fsmDescription descriptionFile;
+        fsmDescription descriptionFile = null;
 
         ArrayList<HashMap<String, String>> inputOutputMaps = new ArrayList();
         ArrayList<HashMap<String, Integer>> inputNextStateMaps = new ArrayList();
@@ -20,32 +21,28 @@ public class fsminterpreter {
         char[] inputArray = null;
         try {
             descriptionFileName = args[0];
-            Scanner scanner = new Scanner(new File(args[1]));
+            descriptionFile = new fsmDescription(descriptionFileName);
+            descriptionFile.readContent();
+            Scanner scanner = new Scanner(System.in);
             if(scanner.hasNext()) {
                 inputArray = scanner.next().replaceAll("\\s+", "").toCharArray();
             }
 
         }
         catch(ArrayIndexOutOfBoundsException e) {
-            System.out.println(badInput);
+            System.out.println();
             System.exit(0);
         }
         catch (IOException e){
-            System.out.println(badInput);
+            System.out.println(badDescription);
             System.exit(0);
         }
+        //Checks that content can be read from the description file correctly, exits if not possible.
 
-        descriptionFile = new fsmDescription(descriptionFileName);
 
         if(descriptionFile.wellFormed()) {
 
-            //Checks that content can be read from the description file correctly, exits if not possible.
-            try {
-                descriptionFile.readContent();
-            } catch (IOException e){
-                System.out.println("Bad input");
-                System.exit(0);
-            }
+
 
             //Creates iterators for current state, input, next state and output for the lists created in the
             //fsmDescription class based off of the description provided to the program.
@@ -76,7 +73,7 @@ public class fsminterpreter {
             }
 
             //Debug printer
-            for(int i = 1; i<inputOutputMaps.size(); i++){
+            /*for(int i = 1; i<inputOutputMaps.size(); i++){
                 Iterator iterator = inputOutputMaps.get(i).keySet().iterator();
                 Iterator iterator2 = inputNextStateMaps.get(i).keySet().iterator();
                 System.out.println("State = " + i + ": ");
@@ -86,10 +83,10 @@ public class fsminterpreter {
                     System.out.println("Input = " + item + ", Output = " + inputOutputMaps.get(i).get(item) + ", Next State = " + inputNextStateMaps.get(i).get(item));
                 }
                 System.out.println();
-            }
+            }*/
         }
         else {
-            System.out.println(badInput);
+            System.out.println(badDescription);
             System.exit(0);
         }
 
@@ -97,20 +94,20 @@ public class fsminterpreter {
             currentState = initialState;
             for(int i = 0; i < inputArray.length; i++){
                 if(inputOutputMaps.get(currentState).containsKey(String.valueOf(inputArray[i])) && inputNextStateMaps.get(currentState).containsKey(String.valueOf(inputArray[i]))){
-                    System.out.print(inputArray[i] +  ", ");
+                    //System.out.print(inputArray[i] +  ", ");
                     System.out.print(inputOutputMaps.get(currentState).get(String.valueOf(inputArray[i])));
                     currentState = inputNextStateMaps.get(currentState).get(String.valueOf(inputArray[i]));
-                    System.out.println(", " + currentState);
+                    //System.out.println(", " + currentState);
                 }
                 else {
-                    System.out.println("Invalid input");
+                    System.out.println(badInput);
                     System.exit(0);
                 }
 
             }
         }
         else{
-            System.out.println("Invalid input");
+            System.out.println(badInput);
             System.exit(0);
         }
     }
