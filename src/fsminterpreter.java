@@ -15,6 +15,7 @@ public class fsminterpreter {
         ArrayList<HashMap<String, String>> inputOutputMaps = new ArrayList();
         ArrayList<HashMap<String, Integer>> inputNextStateMaps = new ArrayList();
         HashSet<Integer> distinctStates;
+        HashSet<String> distinctInput;
         int currentState;
         int initialState = -1;
 
@@ -50,7 +51,8 @@ public class fsminterpreter {
             ListIterator<String> iiterator = descriptionFile.getInputList().listIterator();
             ListIterator<Integer> nsiterator = descriptionFile.getNextStateList().listIterator();
             ListIterator<String> oiterator = descriptionFile.getOutputList().listIterator();
-            distinctStates = new HashSet<>(descriptionFile.getCurrentStateList());
+            distinctStates = descriptionFile.getDistinctState();
+            distinctInput = descriptionFile.getDistinctInput();
             initialState = descriptionFile.getCurrentStateList().get(0);
 
 
@@ -68,9 +70,33 @@ public class fsminterpreter {
                 Integer nextStateInterpret = nsiterator.next();
                 Integer currentStateInterpret = csiterator.next();
 
+                //Ensures that description is not ambiguous, if a certain input has already been considered for a
+                //given state, the fsm is ambiguous and should not run.
+                try {
+                    if (inputOutputMaps.get(currentStateInterpret).containsKey(inputInterpret))
+                        throw new overwriteException();
+                } catch(overwriteException e){
+                    System.out.println(badDescription);
+                    System.out.println(e.getMessage());
+                    System.exit(0);
+                }
                 inputOutputMaps.get(currentStateInterpret).put(inputInterpret, outputInterpret);
                 inputNextStateMaps.get(currentStateInterpret).put(inputInterpret, nextStateInterpret);
             }
+
+            //This tests that every possible input and state combination has been described
+            for(String item : distinctInput){
+                for(int i = 1; i < inputOutputMaps.size(); i++){
+                    if(!inputOutputMaps.get(i).containsKey(item)){
+                        /*System.out.println(badDescription);
+                        System.exit(0);*/
+                        //"Filling in the blanks"
+                        inputOutputMaps.get(i).put(item, "");
+                        inputNextStateMaps.get(i).put(item,i);
+                    }
+                }
+            }
+
 
             //Debug printer
             /*for(int i = 1; i<inputOutputMaps.size(); i++){

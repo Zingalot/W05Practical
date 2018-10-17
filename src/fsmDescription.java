@@ -14,7 +14,8 @@ public class fsmDescription {
     ArrayList<String> inputList = new ArrayList<>();
     ArrayList<String> outputList = new ArrayList<>();
     ArrayList<Integer> nextStateList = new ArrayList<>();
-    List<String> contents = new ArrayList<>();
+    HashSet distinctInput;
+    HashSet distinctState;
 
 
     public fsmDescription(String filename) {
@@ -49,7 +50,6 @@ public class fsmDescription {
     }
 
     public boolean wellFormed() {
-        //Sample code
         boolean legal = true;
         if(this.filename == ""){
             legal = false;
@@ -58,9 +58,13 @@ public class fsmDescription {
             if(!currentStateList.contains(nextStateList.get(i))){
                 legal = false;
             }
+            if(!nextStateList.contains(currentStateList.get(i))){
+                legal = false;
+            }
         }
-        HashSet distinctInput = new HashSet(inputList);
-        HashSet distinctState = new HashSet(currentStateList);
+
+        this.distinctInput = new HashSet(inputList);
+        this.distinctState = new HashSet(currentStateList);
         if(distinctInput.size()*distinctState.size()!=currentStateList.size()){
             legal = false;
         }
@@ -85,5 +89,13 @@ public class fsmDescription {
 
     public ArrayList<String> getOutputList() {
         return outputList;
+    }
+
+    public HashSet<String> getDistinctInput() {
+        return distinctInput;
+    }
+
+    public HashSet getDistinctState() {
+        return distinctState;
     }
 }
